@@ -100,27 +100,43 @@ export function GaleriFotoWO({
 
     return (
       <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">
-        {items.map((foto) => (
-          <div
-            key={foto.id}
-            onClick={() => setFotoAktif(foto)}
-            className="group relative aspect-video cursor-pointer overflow-hidden rounded-lg border border-border bg-muted/40 transition-all hover:border-primary hover:shadow-sm"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={foto.thumbUrl || foto.fullUrl}
-              alt={LABEL_JENIS[foto.jenis]}
-              className="size-full object-cover transition-transform group-hover:scale-105"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-              <Eye className="size-5 text-white" />
+        {items.map((foto) => {
+          const imgSrc =
+            foto.thumbUrl && foto.thumbUrl.trim() !== ""
+              ? foto.thumbUrl
+              : foto.fullUrl && foto.fullUrl.trim() !== ""
+                ? foto.fullUrl
+                : null;
+
+          return (
+            <div
+              key={foto.id}
+              onClick={() => setFotoAktif(foto)}
+              className="group relative aspect-video cursor-pointer overflow-hidden rounded-lg border border-border bg-muted/40 transition-all hover:border-primary hover:shadow-sm"
+            >
+              {imgSrc ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={imgSrc}
+                  alt={LABEL_JENIS[foto.jenis]}
+                  className="size-full object-cover transition-transform group-hover:scale-105"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="flex size-full flex-col items-center justify-center gap-1 p-2 text-center text-muted-foreground">
+                  <Eye className="size-5 opacity-40" />
+                  <span className="text-[10px]">Gambar tidak tersedia</span>
+                </div>
+              )}
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                <Eye className="size-5 text-white" />
+              </div>
+              <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 py-0.5 text-[9px] font-medium text-white">
+                {LABEL_JENIS[foto.jenis]}
+              </span>
             </div>
-            <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 py-0.5 text-[9px] font-medium text-white">
-              {LABEL_JENIS[foto.jenis]}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   };
@@ -217,12 +233,18 @@ export function GaleriFotoWO({
 
           {fotoAktif && (
             <div className="mt-2 flex max-h-[75vh] items-center justify-center overflow-hidden rounded-lg bg-black/90 p-1">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={fotoAktif.fullUrl}
-                alt="Foto Penuh"
-                className="max-h-[70vh] w-auto max-w-full rounded object-contain"
-              />
+              {fotoAktif.fullUrl && fotoAktif.fullUrl.trim() !== "" ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={fotoAktif.fullUrl}
+                  alt="Foto Penuh"
+                  className="max-h-[70vh] w-auto max-w-full rounded object-contain"
+                />
+              ) : (
+                <div className="p-8 text-center text-xs text-white/70">
+                  File gambar tidak tersedia di storage
+                </div>
+              )}
             </div>
           )}
         </DialogContent>

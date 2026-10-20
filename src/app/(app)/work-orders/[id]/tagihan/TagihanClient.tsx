@@ -1151,18 +1151,20 @@ export function TagihanClient({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Terbitkan Invoice Resmi?</AlertDialogTitle>
-            <AlertDialogDescription className="space-y-2">
-              <p>
-                Status Work Order adalah <strong>siap diambil</strong>. Setelah invoice
-                diterbitkan:
-              </p>
-              <ul className="list-disc pl-5 text-xs text-text-muted space-y-1">
-                <li>Nomor invoice resmi otomatis bernomor format <code>INV-YYYYMM-XXXX</code>.</li>
-                <li>Rincian item tagihan dan diskon akan <strong>terkunci secara permanen</strong>.</li>
-                <li>Invoice siap dicetak dan pembayaran dapat dicatat.</li>
-              </ul>
-              <div className="rounded-md bg-muted p-2.5 text-xs font-medium text-text mt-2">
-                Total Tagihan: <span className="font-bold text-primary">{rupiah(total)}</span>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>
+                  Status Work Order adalah <strong>siap diambil</strong>. Setelah invoice
+                  diterbitkan:
+                </p>
+                <ul className="list-disc pl-5 text-xs text-text-muted space-y-1">
+                  <li>Nomor invoice resmi otomatis bernomor format <code>INV-YYYYMM-XXXX</code>.</li>
+                  <li>Rincian item tagihan dan diskon akan <strong>terkunci secara permanen</strong>.</li>
+                  <li>Invoice siap dicetak dan pembayaran dapat dicatat.</li>
+                </ul>
+                <div className="rounded-md bg-muted p-2.5 text-xs font-medium text-text mt-2">
+                  Total Tagihan: <span className="font-bold text-primary">{rupiah(total)}</span>
+                </div>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>

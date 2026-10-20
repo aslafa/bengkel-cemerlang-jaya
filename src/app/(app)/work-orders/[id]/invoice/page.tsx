@@ -16,6 +16,7 @@ import { rupiah, tanggal } from "@/lib/format";
 import { ambilProfilSaya } from "@/lib/profil";
 import { createClient } from "@/lib/supabase/server";
 import { TombolCetak } from "./TombolCetak";
+import { TombolBayarOnline } from "./TombolBayarOnline";
 
 export default async function InvoiceWorkOrder({
   params,
@@ -23,7 +24,7 @@ export default async function InvoiceWorkOrder({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  await ambilProfilSaya();
+  const profil = await ambilProfilSaya();
   const supabase = await createClient();
 
   // 1. Ambil data Work Order dan Invoice
@@ -34,7 +35,7 @@ export default async function InvoiceWorkOrder({
       nomor,
       status,
       created_at,
-      customers:customer_id (nama, telepon, alamat),
+      customers:customer_id (id, nama, email, telepon, alamat),
       vehicles:vehicle_id (plat, merek_model, tahun, transmisi, warna),
       invoices (
         id,
@@ -45,6 +46,7 @@ export default async function InvoiceWorkOrder({
         terbayar,
         status_bayar,
         diterbitkan_at,
+        dibayar_online_at,
         diterbitkan_oleh:profiles (nama)
       )
     `)
@@ -129,8 +131,19 @@ export default async function InvoiceWorkOrder({
 
   return (
     <div className="space-y-6">
-      {/* Tombol Cetak / Navigasi (disembunyikan saat mencetak) */}
-      <TombolCetak workOrderId={id} />
+      {/* Tombol Cetak & Bayar Online (disembunyikan saat mencetak) */}
+      <TombolCetak workOrderId={id}>
+        {(profil.peran === "admin" || profil.peran === "owner") && (
+          <TombolBayarOnline
+            invoiceId={invoice.id}
+            initialStatusBayar={invoice.status_bayar}
+            initialDibayarAt={invoice.dibayar_online_at}
+            customerId={customer?.id ?? null}
+            customerNama={customer?.nama ?? "Pelanggan"}
+            customerEmail={customer?.email ?? null}
+          />
+        )}
+      </TombolCetak>
 
       {/* Lembar Invoice Cetak A4 */}
       <div className="mx-auto max-w-4xl rounded-xl border bg-card p-8 md:p-12 shadow-sm text-text print:border-none print:shadow-none print:p-0 print:max-w-none">
@@ -185,6 +198,11 @@ export default async function InvoiceWorkOrder({
                     ? "DIBAYAR SEBAGIAN"
                     : "BELUM BAYAR"}
               </Badge>
+              {invoice.status_bayar === "lunas" && invoice.dibayar_online_at && (
+                <p className="text-[11px] text-success font-medium mt-1">
+                  Waktu Dibayar: {tanggal(invoice.dibayar_online_at)}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -197,6 +215,15 @@ export default async function InvoiceWorkOrder({
             </h3>
             <p className="text-sm font-bold text-text">{customer?.nama ?? "-"}</p>
             <p className="text-text-muted">{customer?.telepon ?? "-"}</p>
+            <p className="text-text-muted">
+              {customer?.email ? (
+                customer.email
+              ) : (
+                <span className="italic text-amber-600 dark:text-amber-400 font-medium">
+                  (Email belum diisi)
+                </span>
+              )}
+            </p>
             {customer?.alamat && <p className="text-text-muted mt-0.5">{customer.alamat}</p>}
           </div>
 
